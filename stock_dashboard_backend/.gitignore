@@ -1,0 +1,15 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Private files 
+src/stock_dashboard_backend/json_data/
+src/stock_dashboard_backend/data_collection/
+*.json

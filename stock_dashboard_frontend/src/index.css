@@ -1,0 +1,45 @@
+:root {
+  /* --------------------------------------------------
+   * Brand Core & State Variables
+   * -------------------------------------------------- */
+  --primary: #8b5cf6;            /* Neon Violet - Primary actions, buttons, active tabs */
+  --primary-hover: #a78bfa;      /* Bright Iris - Interactive hover state */
+  --primary-active: #7c3aed;     /* Deep Violet - Pressed state */
+  --accent: #e086d3;             /* Electric Magenta - Highlights, badges, gradient stops */
+
+  /* --------------------------------------------------
+   * Backgrounds & Glass Surfaces
+   * -------------------------------------------------- */
+  --bg-dark: #07050e;            /* Obsidian Base Page Background */
+  --bg-gradient: radial-gradient(
+    circle at 50% -20%,
+    rgba(139, 92, 246, 0.25) 0%,
+    rgba(120, 40, 200, 0.1) 40%,
+    var(--bg-dark) 80%
+  );                             /* Ambient background glow mesh */
+
+  --surface-dark: rgba(255, 255, 255, 0.03);        /* Translucent glass card background */
+  --surface-dark-hover: rgba(255, 255, 255, 0.06);  /* Card background hover state */
+  --surface-dark-active: rgba(255, 255, 255, 0.09); /* Card background active/pressed state */
+
+  /* --------------------------------------------------
+   * Glass Borders & Dividers
+   * -------------------------------------------------- */
+  --border-dark: rgba(255, 255, 255, 0.08);         /* Subtle translucent glass border */
+  --border-dark-hover: rgba(167, 139, 250, 0.3);    /* Glowing border on card hover */
+  --border-focus: var(--primary);                   /* Input focus ring outline */
+
+  /* --------------------------------------------------
+   * Typography
+   * -------------------------------------------------- */
+  --text-main: #f3f4f6;          /* High contrast primary text */
+  --text-muted: #9ca3af;         /* Secondary text, placeholders, captions */
+
+  /* --------------------------------------------------
+   * Glow Effects & Blurs
+   * -------------------------------------------------- */
+  --glass-blur: blur(16px);
+  --glow-subtle: 0 8px 32px 0 rgba(139, 92, 246, 0.12);
+  --glow-intense: 0 0 35px 2px rgba(167, 139, 250, 0.35);
+  --glow-primary: 0 0 25px rgba(139, 92, 246, 0.4);
+}
