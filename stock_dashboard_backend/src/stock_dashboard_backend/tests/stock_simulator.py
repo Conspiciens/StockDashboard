@@ -3,21 +3,19 @@ import time
 
 import numpy as np
 
+from pathlib import Path
+
 PRICE = 158.20 
 DRIFT = 0.05
 VOLATILITY = 0.00001
 
+price = PRICE
+START_TIME = time.time() 
+
 PRICE_FOLLOWS = 160.03 
 
-path = Path("./").resolve()
-
-router = APIRouter() 
-
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from pathlib import Path
 
-def send_message(): 
-    nano_timestamp = time.time_ns() 
 
 def jitter_volatility() -> float:
     rng = np.random.default_rng() 
@@ -30,15 +28,47 @@ def simulate_price(price: float, volatility: float, time_sec: float):
     dist = np.random.normal(0, 1)
     return price * np.exp((((DRIFT - (0.5 * (volatility ** 2)))) * time_sec) + (volatility * (dist * np.sqrt(time_sec))))
 
-def send_simulate_price(): 
-    time_sec = 1
-    price = PRICE
+def retrieve_simulate_price() -> str: 
+    global price 
 
-    while time_sec < 3000: 
-        volatility = jitter_volatility() 
-        price = simulate_price(price, volatility, time_sec)
-        print(f"Price: {price}\n")
-        time_sec += 1 
-        time.sleep(0.01)
+    time_executed = time.time()
+    seconds = time.time() - START_TIME
+
+    print(f"Seconds: {seconds}")
+
+    volatility = jitter_volatility() 
+    price = float(simulate_price(price, volatility, seconds))
+
+    # {
+    #     "T": "q",
+    #     "S": "AAPL",
+    #     "bx": "V",
+    #     "bp": 341.98,
+    #     "bs": 40,
+    #     "ax": "V",
+    #     "ap": 342.03,
+    #     "as": 40,
+    #     "c": [
+    #         "R"
+    #     ],
+    #     "z": "C",
+    #     "t": "2026-10-15T19:42:26.247469184Z"
+    # }
+
+    return f'''[{{
+        "T": "q", 
+        "S": "AAPL", 
+        "bx": "V", 
+        "bp": {price}, 
+        "bs": 40, 
+        "ax": "V",
+        "ap": {price + 1.02},  
+        "as": 40, 
+        "c": [
+            "R"
+        ], 
+        "z": "C",
+        "t": {time_executed}
+    }}]'''
 
 

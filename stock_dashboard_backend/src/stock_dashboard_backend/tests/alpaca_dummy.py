@@ -8,15 +8,12 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from pathlib import Path
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
-from stock_simulator import simulate_price
+from .stock_simulator import retrieve_simulate_price
 from ..websocket_manager import api_connection_manager, manager
-
-path = Path("./").resolve()
 
 router = APIRouter() 
 
 # Alpaca requests are handled in this file 
-
 async def check_if_terminate(frontend_websocket: WebSocket): 
     print("Checking for termination")
     try: 
@@ -42,15 +39,13 @@ async def send_data_to_frontend(frontend_websocket: WebSocket, dummy_json_data: 
     
     try: 
         while True: 
-            # Iterate through json and send every obj
-            for obj in ijson.items(dummy_json_data, "item", use_float=True): 
-                await asyncio.sleep(5)
-                print("Sending packet")
+           # Iterate through json and send every obj
+            data = retrieve_simulate_price()
+            formatted_data = json.loads(data)
+
+            for obj in formatted_data: 
                 await frontend_websocket.send_text(json.dumps(obj))
-
-            await asyncio.sleep(5)
-
-            dummy_json_data.seek(0)
+                await asyncio.sleep(1)
 
     # Handles the Cancelled Error by task.cancel() 
     except asyncio.CancelledError as e: 
