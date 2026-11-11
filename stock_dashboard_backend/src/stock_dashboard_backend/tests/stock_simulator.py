@@ -1,21 +1,25 @@
 import math
+import os 
 import time 
 
 import numpy as np
 
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+TIMEZONE = "US/Eastern"
 
 PRICE = 158.20 
 DRIFT = 0.05
 VOLATILITY = 0.00001
 
 price = PRICE
-START_TIME = time.time() 
-
 PRICE_FOLLOWS = 160.03 
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+START_TIME = datetime.now(ZoneInfo(TIMEZONE))
 
 def jitter_volatility() -> float:
     rng = np.random.default_rng() 
@@ -31,8 +35,8 @@ def simulate_price(price: float, volatility: float, time_sec: float):
 def retrieve_simulate_price() -> str: 
     global price 
 
-    time_executed = time.time()
-    seconds = time.time() - START_TIME
+    time_executed = datetime.now(ZoneInfo(TIMEZONE))
+    seconds = (time_executed - START_TIME).total_seconds()
 
     print(f"Seconds: {seconds}")
 
@@ -68,7 +72,7 @@ def retrieve_simulate_price() -> str:
             "R"
         ], 
         "z": "C",
-        "t": {time_executed}
+        "t": \"{time_executed}\"
     }}]'''
 
 

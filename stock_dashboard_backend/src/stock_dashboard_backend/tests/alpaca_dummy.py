@@ -35,7 +35,7 @@ async def check_if_terminate(frontend_websocket: WebSocket):
     except Exception as e: 
         print(e)
     
-async def send_data_to_frontend(frontend_websocket: WebSocket, dummy_json_data: TextIO):
+async def send_data_to_frontend(frontend_websocket: WebSocket):
     
     try: 
         while True: 
@@ -63,10 +63,9 @@ async def send_data_to_frontend(frontend_websocket: WebSocket, dummy_json_data: 
 @router.websocket("/ws/{tick_symbol}")
 async def connect_to_live_data(frontend_websocket: WebSocket, tick_symbol: str): 
     await manager.connect(frontend_websocket)
-    dummy_json_data = open(path / "live_trades_dummy_data_2.json", "rb")
 
     consumer_task = asyncio.create_task(check_if_terminate(frontend_websocket))
-    producer_task = asyncio.create_task(send_data_to_frontend(frontend_websocket, dummy_json_data))
+    producer_task = asyncio.create_task(send_data_to_frontend(frontend_websocket))
 
     done, pending = await asyncio.wait(
         [consumer_task, producer_task], 
