@@ -13,13 +13,36 @@ const defaultOption = {
         left: 'center'
       },
       tooltip: {
-        show: false,
-        trigger: 'axis'
+        show: true,
+        trigger: 'axis', 
+        position: function (pt: any) {
+          return [pt[0], '10%'];
+        }
       }, 
+      grid: [
+        {
+          height: '100%',
+          width: '50%',
+        },
+        {
+          // show: true,
+          // borderColor: 'purple'
+        }
+      ],
+      toolbox: [
+        {
+          feature: {
+            dataZoom: {
+              yAxisIndex: 1
+            }
+          }
+        }
+      ], 
       xAxis: [
         {
-          type: 'time',
-          interval: 1000 * 60 * 60 * 24, // 30 minutes
+          type: 'category',
+          boundaryGap: false,
+          // interval: 1000 * 60 * 60 * 24, // 30 minutes
           axisLabel: {
             showMinLabel: true,
             showMaxLabel: true,
@@ -27,22 +50,23 @@ const defaultOption = {
           breakLabelLayout: {
             // Disable auto move of break labels if overlapping,
             // and use `axisLabel.formatter` to control the label display.
-            moveOverlap: false
+            moveOverlap: true 
           },
+          animation: false, 
         }
       ],
       yAxis: {
         type: 'value',
         min: 'dataMin', 
+        boundaryGap: [0, '100%'], 
+        animation: false
       },
       dataZoom: [
         {
+          yAxisIndex: 1,
           type: 'inside',
-          xAxisIndex: 0
-        },
-        {
-          type: 'slider',
-          xAxisIndex: 0
+          start: 0, 
+          end: 0.1
         }
       ],
       series: [
@@ -61,9 +85,11 @@ const defaultOption = {
               }
             ])
           },
+          showSymbol: false, 
           data: [] as any
         },
-      ]
+      ], 
+      animation: false, 
 }
 
 function Dashboard() {
@@ -71,11 +97,13 @@ function Dashboard() {
 
   const eChartsRef = useRef<InstanceType<typeof ReactECharts>>(null);
   const [message, setMessage] = useState<(string | number)[]>([]);
+
+  defaultOption.title.text = params.tickSymbol || ''; 
   initWebSocket(
     params.tickSymbol, 
     setMessage 
   );
-  
+
   useEffect(() => {
     if (eChartsRef.current == null) 
       return;
@@ -83,13 +111,13 @@ function Dashboard() {
     const eChartsInstance = eChartsRef.
       current.getEchartsInstance(); 
 
-
     if (message.length == 0)
       return
 
     /* 
       Update the EChart options 
     */
+    // if (defaultOption.series[0].data.size() > 100)
     defaultOption.series[0]
       .data.push(message);
     eChartsInstance.setOption(defaultOption);

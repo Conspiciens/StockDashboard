@@ -35,7 +35,6 @@ export default function initWebSocket(
         } 
 
         websocket.current.onmessage = (event: MessageEvent) => {
-            console.log("data...");
             const data = JSON.parse(event.data) as Quote;
 
             const price = data.bp;
