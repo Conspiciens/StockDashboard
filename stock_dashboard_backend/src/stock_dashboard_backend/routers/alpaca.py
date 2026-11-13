@@ -1,10 +1,14 @@
 from fastapi import APIRouter, WebSocket
+from pathlib import Path
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
+from ..credentials import credentials
 from ..websocket_manager import api_connection_manager, manager
 
 
 router = APIRouter() 
+
+REST_LIMIT = 5000 
 
 # Alpaca requests are handled in this file 
 async def check_if_terminate(frontend_websocket: WebSocket): 
@@ -74,6 +78,22 @@ async def connect_to_live_data(frontend_websocket: WebSocket, tick_symbol: str):
 
     for task in pending: 
         task.cancel() 
+    
+@router.get("/lastest_trades/{tick_symbol}")
+async def fetch_latest_trades(tick_symbol: str): 
+    secrets = credentials.get_cred_aplaca() 
+
+    link = credentials.get_alpaca_request_link() 
+    link = link.replace("{symbol}", tick_symbol)
+
+    headers = {
+        "accept": "application/json", 
+        "APACA-API-KEY-ID": secrets.key,
+        "APACA-API-SECRET-KEY": secrets.secret
+    }
+    
+    res = requests_api(link, None, headers)
+    return res 
 
 # @router.websocket("/ws/{tick_symbol}")
 # async def connect_to_live_data(frontend_websocket: WebSocket, tick_symbol: str): 

@@ -2,6 +2,7 @@ import React, { use, useEffect, useMemo, useRef, useState } from 'react';
 import { data, useParams } from 'react-router-dom';
 
 import initWebSocket from '../services/websocket';
+import type { Trade } from '../types/type.ts';
 
 import * as echarts from 'echarts/core'
 import ReactECharts from 'echarts-for-react'
@@ -21,8 +22,9 @@ const defaultOption = {
       }, 
       grid: [
         {
-          height: '100%',
-          width: '50%',
+          left: 0, 
+          height: 800,
+          width: '100%',
         },
         {
           // show: true,
@@ -103,6 +105,36 @@ function Dashboard() {
     params.tickSymbol, 
     setMessage 
   );
+
+  const loadLatestTrades = async() => {
+    if (eChartsRef.current == null) 
+      return;
+
+    const eChartsInstance = eChartsRef.
+      current.getEchartsInstance(); 
+
+    try { 
+      const response = await fetch(`http://127.0.0.1:8000/latest_trades/${params.tickSymbol}`)
+      if (!response.ok) {
+        throw Error("Failed to get response");
+      }
+
+      const trades: Trade[] = await response.json();
+
+      const priceTrades = trades.map(({p, t}) => ([t, p]))
+      console.log(priceTrades);
+      defaultOption.series[0]
+        .data = priceTrades;
+      eChartsInstance.setOption(defaultOption);
+      
+    } catch (err) {
+      console.log(`Error occured when fetching initial trades: ${err}`);
+    }
+  }
+
+  useEffect(() => {
+    loadLatestTrades();
+  }, [])
 
   useEffect(() => {
     if (eChartsRef.current == null) 

@@ -5,13 +5,17 @@ import ijson
 
 from typing import TextIO
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from pathlib import Path
+from pathlib import Path 
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
+from ..credentials import credentials
 from .stock_simulator import retrieve_simulate_price
 from ..websocket_manager import api_connection_manager, manager
 
 router = APIRouter() 
+path = Path() 
+
+REST_LIMIT = 5000
 
 # Alpaca requests are handled in this file 
 async def check_if_terminate(frontend_websocket: WebSocket): 
@@ -42,6 +46,8 @@ async def send_data_to_frontend(frontend_websocket: WebSocket):
            # Iterate through json and send every obj
             data = retrieve_simulate_price()
             formatted_data = json.loads(data)
+
+            print(f"formatted data: {formatted_data}")
 
             for obj in formatted_data: 
                 await frontend_websocket.send_text(json.dumps(obj))
@@ -75,3 +81,19 @@ async def connect_to_live_data(frontend_websocket: WebSocket, tick_symbol: str):
 
     for task in pending: 
         task.cancel() 
+
+@router.get("/latest_trades/{tick_symbol}")
+async def fetch_latest_trades(tick_symbol: str): 
+    secrets = json.loads(credentials.get_cred_aplaca())
+
+    link = credentials.get_alpaca_request_link() 
+    link = link.replace("{symbol}", tick_symbol)
+
+    query = {
+        "accept": "application/json", 
+        "APACA-API-KEY-ID": secrets["key"],
+        "APACA-API-SECRET-KEY": secrets["secret"]
+    }
+    
+    dummy_latest_trades = open(path / "rest_trades_dummy_data.json")
+    return json.load(dummy_latest_trades)["trades"]

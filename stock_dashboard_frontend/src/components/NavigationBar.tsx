@@ -1,5 +1,5 @@
 import { IconSearch } from '@tabler/icons-react';
-import { Select, Burger, Center, Divider, Drawer, Group, ScrollArea, Space, Autocomplete } from '@mantine/core';
+import { Center, Divider, Drawer, Group, ScrollArea, Space, Autocomplete } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './HeaderSearch.module.css';
 import { useEffect, useState } from 'react';

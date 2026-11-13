@@ -12,7 +12,6 @@ export interface Quote {
     z: string; 
     t: string;
 }
-
 // {'T': 'q', 
 // 'S': 'AAPL', 
 // 'bx': 'V', 
@@ -25,3 +24,25 @@ export interface Quote {
 //  'c': ['R'], 
 // 'z': 'C', 
 // 't': '2026-10-15T19:42:26.749542645Z'}
+
+export interface Trade {
+    c: Array<string>; 
+    i: number; 
+    p: number; 
+    s: number; 
+    t: string; 
+    x: string 
+    z: string 
+}
+
+//      "c": [
+//        "@",
+//        "T",
+//        "I"
+//      ],
+//      "i": 1,
+//      "p": 347.76,
+//      "s": 1,
+//      "t": "2026-11-11T09:00:00.056786179Z",
+//      "x": "K",
+//      "z": "C"
