@@ -7,6 +7,8 @@ import type { Trade } from '../types/type.ts';
 import * as echarts from 'echarts/core'
 import ReactECharts from 'echarts-for-react'
 
+const MAX_POINTS = 10000
+
 const defaultOption = {
       useUTC: false,
       title: {
@@ -45,6 +47,9 @@ const defaultOption = {
           type: 'category',
           boundaryGap: false,
           // interval: 1000 * 60 * 60 * 24, // 30 minutes
+          axisLine: {
+            onZero: false
+          },
           axisLabel: {
             showMinLabel: true,
             showMaxLabel: true,
@@ -65,10 +70,11 @@ const defaultOption = {
       },
       dataZoom: [
         {
-          yAxisIndex: 1,
+          // yAxisIndex: 1,
           type: 'inside',
-          start: 0, 
-          end: 0.1
+          // start: Math.max(0, data.length - 100), 
+          // end: data.length - 1
+          rangeMode: ['value', 'value']
         }
       ],
       series: [
@@ -121,12 +127,10 @@ function Dashboard() {
 
       const trades: Trade[] = await response.json();
 
-      const priceTrades = trades.map(({p, t}) => ([t, p]))
-      console.log(priceTrades);
+      const timePriceTrades = trades.map(({p, t}) => ([t, p]))
       defaultOption.series[0]
-        .data = priceTrades;
+        .data = timePriceTrades;
       eChartsInstance.setOption(defaultOption);
-      
     } catch (err) {
       console.log(`Error occured when fetching initial trades: ${err}`);
     }
@@ -147,11 +151,23 @@ function Dashboard() {
       return
 
     /* 
-      Update the EChart options 
+      Update the EChart options, checks whether it's reaching the max points 
     */
-    // if (defaultOption.series[0].data.size() > 100)
-    defaultOption.series[0]
-      .data.push(message);
+    if (defaultOption.series[0].data.length < MAX_POINTS) {
+      defaultOption.series[0]
+        .data.push(message);
+    } else {
+      defaultOption.series[0]
+        .data.shift(); 
+      defaultOption.series[0]
+        .data.push(message);
+    }
+
+    /* Maintain the zoom the user has manipluated */
+    let settings = eChartsInstance.getOption(); 
+    const currentZoom = settings.dataZoom[0];
+    defaultOption.dataZoom[0] = currentZoom;
+
     eChartsInstance.setOption(defaultOption);
 
     return () => {
